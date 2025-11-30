@@ -11,12 +11,6 @@ use std::io::Cursor;
 use serde::Deserialize;
 use tower_http::limit::RequestBodyLimitLayer;
 
-// Sahte Veritabanı: Geçerli API Anahtarları
-const VALID_API_KEYS: [&str; 2] = [
-    "rust_is_fast_123", // Müşteri 1 (Premium)
-    "demo_user_007",    // Müşteri 2 (Trial)
-];
-
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
@@ -44,9 +38,14 @@ async fn auth_middleware(req: Request, next: Next) -> Result<Response, StatusCod
         .get("x-api-key")
         .and_then(|header| header.to_str().ok());
 
+    // Ortam değişkeninden geçerli anahtarları al (Virgülle ayrılmış)
+    // Örn: API_KEYS="rust_is_fast_123,demo_user_007"
+    let env_keys = std::env::var("API_KEYS").unwrap_or_else(|_| "rust_is_fast_123,demo_user_007".to_string());
+    let valid_keys: Vec<&str> = env_keys.split(',').collect();
+
     // 2. Anahtarı kontrol et
     match api_key {
-        Some(key) if VALID_API_KEYS.contains(&key) => {
+        Some(key) if valid_keys.contains(&key) => {
             // Anahtar geçerli, geçiş izni ver (Handler'a git)
             Ok(next.run(req).await)
         }

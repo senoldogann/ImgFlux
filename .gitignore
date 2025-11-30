@@ -1,1 +1,18 @@
+# Rust
 /target
+
+
+# Environment Variables
+.env
+
+# Test Images & Outputs
+test.jpg
+*.png
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
